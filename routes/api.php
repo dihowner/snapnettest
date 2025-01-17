@@ -42,7 +42,7 @@ Route::middleware(['auth:sanctum'])->group(function () {
         Route::delete('/{id}', 'destroy')->name('project.destroy'); //https://snapnet.local/api/project/1
 
         Route::post('/{projectId}/assign-employee', 'addEmployeeToProject')->name('project.assign-employee'); // https://snapnet.local/api/project/1/assign-employee
-        Route::post('/{projectId}/assign-employee', 'addEmployeeToProject')->name('project.assign-employee'); // https://snapnet.local/api/project/1/assign-employee
+        Route::post('/summary', 'getSummary')->name('project.assign-employee'); // https://snapnet.local/api/project/summary
     });
 
     Route::middleware('role:Admin')->controller(RoleController::class)->group(function () {

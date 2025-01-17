@@ -2,10 +2,12 @@
 
 namespace App\Http\Controllers;
 
-use App\Http\Requests\EmployeeReqeust;
 use Throwable;
+use App\Models\Employee;
 use App\Models\Projects;
+use Illuminate\Support\Facades\DB;
 use App\Http\Requests\ProjectRequest;
+use App\Http\Requests\EmployeeReqeust;
 
 class ProjectsController extends Controller
 {
@@ -131,6 +133,35 @@ class ProjectsController extends Controller
                 'message' => 'Employee added to project and email sent successfully!',
                 'data' => array_merge($employee->toArray(), $project->toArray()),
             ], 200);
+        } catch(Throwable $e) {
+            return response()->json([
+                'message' => $e->getMessage()
+            ], 400);
+        }
+    }
+
+    public function getSummary()
+    {
+        try {
+            // Fetch total counts
+            $totalProjects = Projects::count();
+            $totalEmployees = Employee::count();
+
+            // Fetch breakdown by status
+            $projectStatusBreakdown = Projects::select('status', DB::raw('count(*) as count'))
+                ->groupBy('status')
+                ->get();
+
+            // Fetch projects with their associated employees
+            $projects = Projects::with('employees:id,project_id,name,email,position')->get();
+
+            // Return the data as JSON
+            return response()->json([
+                'total_projects' => $totalProjects,
+                'total_employees' => $totalEmployees,
+                'status_breakdown' => $projectStatusBreakdown,
+                'projects' => $projects,
+            ]);
         } catch(Throwable $e) {
             return response()->json([
                 'message' => $e->getMessage()
